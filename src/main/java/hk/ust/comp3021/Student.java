@@ -51,4 +51,36 @@ public class Student implements EventHandler {
     public void dropActivity(Activity a){
         registeredActivities.remove(a);
     }
+
+    @Override
+    public String toString() {
+        return this.StudentID;
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        if (event instanceof ActivityEvent) {
+            ActivityEvent activityEvent = (ActivityEvent) event;
+            Activity activity = activityEvent.getActivity();
+            if (!this.registeredActivities.contains(activity)) return;
+
+            switch (activityEvent.getActionType()) {
+                case ACTIVITY_POSTPONED:
+                    System.out.println("Student " + StudentID + " is notified that Activity " + activity.getActivityID() + " has postponed.");
+                    break;
+                case ACTIVITY_FINISHED:
+                    // 更新学生状态，例如移动活动到完成列表
+                    finishedActivities.add(activity);
+                    registeredActivities.remove(activity);
+                    passedDuration += activity.getDuration();
+                    System.out.println("Student " + StudentID + " is notified that Activity " + activity.getActivityID() + " has finished.");
+                    break;
+                case ACTIVITY_CANCELLED:
+                    // 从注册活动中移除
+                    registeredActivities.remove(activity);
+                    System.out.println("Student " + StudentID + " is notified that Activity " + activity.getActivityID() + " has cancelled.");
+                    break;
+            }
+        }
+    }
 }
